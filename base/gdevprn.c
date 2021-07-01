@@ -1392,6 +1392,8 @@ gx_default_create_buf_device(gx_device **pbdev, gx_device *target, int y,
     }
     if (target == (gx_device *)mdev) {
         dev_t_proc_dev_spec_op((*orig_dso), gx_device) = dev_proc(mdev, dev_spec_op);
+        dev_proc_encode_color(*orig_encode_color) = dev_proc(mdev, encode_color);
+        dev_proc_decode_color(*orig_decode_color) = dev_proc(mdev, decode_color);
         /* The following is a special hack for setting up printer devices. */
         assign_dev_procs(mdev, mdproto);
         mdev->initialize_device_procs = mdproto->initialize_device_procs;
@@ -1399,6 +1401,8 @@ gx_default_create_buf_device(gx_device **pbdev, gx_device *target, int y,
         /* We know mdev->procs.initialize_device is NULL! */
         /* Do not override the dev_spec_op! */
         dev_proc(mdev, dev_spec_op) = orig_dso;
+        fill_dev_proc(mdev, encode_color, orig_encode_color);
+        fill_dev_proc(mdev, decode_color, orig_decode_color);
         check_device_separable((gx_device *)mdev);
         /* In order for saved-pages to work, we need to hook the dev_spec_op */
         if (mdev->procs.dev_spec_op == NULL || mdev->procs.dev_spec_op == gx_default_dev_spec_op)

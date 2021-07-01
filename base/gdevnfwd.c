@@ -181,6 +181,8 @@ gx_forward_map_rgb_color(gx_device * dev, const gx_color_value cv[])
     gx_device_forward * const fdev = (gx_device_forward *)dev;
     gx_device *tdev = fdev->target;
 
+    exit(1);
+
     return (tdev == 0 ? gx_error_encode_color(dev, cv) :
             dev_proc(tdev, map_rgb_color)(tdev, cv));
 }
@@ -191,6 +193,8 @@ gx_forward_map_color_rgb(gx_device * dev, gx_color_index color,
 {
     gx_device_forward * const fdev = (gx_device_forward *)dev;
     gx_device *tdev = fdev->target;
+
+    exit(1);
 
     return (tdev == 0 ? gx_default_map_color_rgb(dev, color, prgb) :
             dev_proc(tdev, map_color_rgb)(tdev, color, prgb));

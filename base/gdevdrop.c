@@ -241,7 +241,7 @@ unpack_colors_to_standard(gx_device * dev, gx_color_index real_colors[2],
         gx_color_value rgb[3];
         gx_color_index pixel;
 
-        (*dev_proc(dev, map_color_rgb)) (dev, colors[i], rgb);
+        gx_map_color_rgb(dev, colors[i], rgb);
         pixel = gx_color_value_to_byte(rgb[0]);
         if (depth > 8) {
             pixel = (pixel << 16) +
@@ -368,7 +368,7 @@ pack_from_standard(gx_device_memory * dev, int y, int destx, const byte * src,
     byte *dest = scan_line_base(dev, y);
     dev_proc_map_rgb_color((*map)) =
         (dev->color_info.num_components == 4 ?
-         map_rgb_to_color_via_cmyk : dev_proc(dev, map_rgb_color));
+         map_rgb_to_color_via_cmyk : gx_map_rgb_color);
     int bit_x = destx * depth;
     byte *dp = dest + (bit_x >> 3);
     /* RJW: I'm suspicious of this; see how shift = bit_x & 7 in the planar
@@ -438,7 +438,7 @@ pack_planar_from_standard(gx_device_memory * dev, int y, int destx,
     /* This code assumes that all planar planes have the same depth */
     dev_proc_map_rgb_color((*map)) =
         (dev->color_info.num_components == 4 ?
-         map_rgb_to_color_via_cmyk : dev_proc(dev, map_rgb_color));
+         map_rgb_to_color_via_cmyk : gx_map_rgb_color);
     int pdepth = dev->plane_depth;
     int bit_x = destx * pdepth;
     byte *dp[GX_DEVICE_COLOR_MAX_COMPONENTS];

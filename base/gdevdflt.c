@@ -63,8 +63,10 @@ static gx_color_index
 {
     dev_proc_encode_color(*encode_proc);
 
+    encode_proc = dev_proc(dev, encode_color);
+#if 0
     /* use encode_color if it has been provided */
-    if ((encode_proc = dev_proc(dev, encode_color)) == 0) {
+    if (encode_proc == NULL) {
         if (dev->color_info.num_components == 1                          &&
             dev_proc(dev, map_rgb_color) != 0) {
             set_cinfo_polarity(dev, GX_CINFO_POLARITY_ADDITIVE);
@@ -76,6 +78,7 @@ static gx_color_index
                  (encode_proc = dev_proc(dev, map_cmyk_color)) != 0   )
             set_cinfo_polarity(dev, GX_CINFO_POLARITY_SUBTRACTIVE);
     }
+#endif
 
     /*
      * If no encode_color procedure at this point, the color model had
@@ -88,7 +91,7 @@ static gx_color_index
      * an encoding. This is the case even for weakly linear and separable
      * color models with a known polarity.
      */
-    if (encode_proc == 0) {
+    if (encode_proc == NULL) {
         if (dev->color_info.num_components == 1 && dev->color_info.depth != 0) {
             set_cinfo_polarity(dev, GX_CINFO_POLARITY_ADDITIVE);
             if (dev->color_info.max_gray == (1 << dev->color_info.depth) - 1)
@@ -204,11 +207,8 @@ gx_default_1_add_decode_color(
     gx_color_index  color,
     gx_color_value  cv[1] )
 {
-    gx_color_value  rgb[3];
-    int             code = dev_proc(dev, map_color_rgb)(dev, color, rgb);
-
-    cv[0] = rgb[0];
-    return code;
+    exit(1);
+    return -1;
 }
 
 static int
@@ -217,11 +217,8 @@ gx_default_1_sub_decode_color(
     gx_color_index  color,
     gx_color_value  cv[1] )
 {
-    gx_color_value  rgb[3];
-    int             code = dev_proc(dev, map_color_rgb)(dev, color, rgb);
-
-    cv[0] = gx_max_color_value - rgb[0];
-    return code;
+    exit(1);
+    return -1;
 }
 
 /*
@@ -244,18 +241,8 @@ gx_default_cmyk_decode_color(
     if (colors_are_separable_and_linear(&dev->color_info))
         return gx_default_decode_color(dev, color, cv);
     else {
-        int i, code = dev_proc(dev, map_color_rgb)(dev, color, cv);
-        gx_color_value min_val = gx_max_color_value;
-
-        for (i = 0; i < 3; i++) {
-            if ((cv[i] = gx_max_color_value - cv[i]) < min_val)
-                min_val = cv[i];
-        }
-        for (i = 0; i < 3; i++)
-            cv[i] -= min_val;
-        cv[3] = min_val;
-
-        return code;
+        exit(1);
+        return -1;
     }
 }
 
@@ -289,6 +276,7 @@ static int
      * provided this method. While this default may not be correct, we are not
      * introducing any new errors by using it.
      */
+#if 0
     if (dev_proc(dev, map_color_rgb) != 0) {
 
         /* if the device has a DeviceRGB color model, use map_color_rgb */
@@ -326,7 +314,7 @@ static int
                 return &gx_default_cmyk_decode_color;
         }
     }
-
+#endif
     /*
      * The separable and linear case will already have been handled by
      * code in gx_device_fill_in_procs, so at this point we can only hope

@@ -156,6 +156,7 @@ int default_subclass_close_device(gx_device *dev)
 
 gx_color_index default_subclass_map_rgb_color(gx_device *dev, const gx_color_value cv[])
 {
+exit(1);
     if (dev->child)
         return dev_proc(dev->child, map_rgb_color)(dev->child, cv);
     else
@@ -165,6 +166,7 @@ gx_color_index default_subclass_map_rgb_color(gx_device *dev, const gx_color_val
 
 int default_subclass_map_color_rgb(gx_device *dev, gx_color_index color, gx_color_value rgb[3])
 {
+exit(1);
     if (dev->child)
         return dev_proc(dev->child, map_color_rgb)(dev->child, color, rgb);
     /* else */

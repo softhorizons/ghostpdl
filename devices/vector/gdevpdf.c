@@ -229,6 +229,8 @@ pdfwrite_initialize_device_procs(gx_device *dev)
     set_dev_proc(dev, close_device, pdf_close);
     set_dev_proc(dev, map_rgb_color, gx_default_rgb_map_rgb_color);
     set_dev_proc(dev, map_color_rgb, gx_default_rgb_map_color_rgb);
+    set_dev_proc(dev, encode_color, gx_default_rgb_map_rgb_color);
+    set_dev_proc(dev, decode_color, gx_default_rgb_map_color_rgb);
     set_dev_proc(dev, fill_rectangle, gdev_pdf_fill_rectangle);
     set_dev_proc(dev, copy_mono, gdev_pdf_copy_mono);
     set_dev_proc(dev, copy_color, gdev_pdf_copy_color);

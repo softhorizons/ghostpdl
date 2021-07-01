@@ -107,7 +107,7 @@ pc_write_palette(gx_device * dev, uint max_index, gp_file * file)
     gx_color_value rgb[3];
 
     for (i = 0; i < max_index; i++) {
-        (*dev_proc(dev, map_color_rgb)) (dev, (gx_color_index) i, rgb);
+        gx_map_color_rgb(dev, (gx_color_index) i, rgb);
         for (c = 0; c < 3; c++) {
             byte b = rgb[c] >> (gx_color_value_bits - 8);
 

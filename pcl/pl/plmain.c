@@ -2356,7 +2356,7 @@ pl_main_process_options(pl_main_instance_t * pmi, arg_list * pal,
                         gx_color_value cmyk_white[4] = { 0, 0, 0, 0 };
 
                         if (pdev->color_info.polarity == GX_CINFO_POLARITY_ADDITIVE)
-                            color = dev_proc(pdev, map_rgb_color)(pdev, rgb_white);
+                            color = gx_map_rgb_color(pdev, rgb_white);
                         else
                             color = dev_proc(pdev, map_cmyk_color)(pdev, cmyk_white);
                         code = dev_proc(pdev, fill_rectangle)(pdev, 0, 0, pdev->width, pdev->height, color);

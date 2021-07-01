@@ -202,6 +202,8 @@ gx_backwards_compatible_gray_encode(gx_device *dev,
     gx_color_value gray_val = cv[0];
     gx_color_value rgb_cv[3];
 
+    exit(1);
+
     rgb_cv[0] = gray_val;
     rgb_cv[1] = gray_val;
     rgb_cv[2] = gray_val;
@@ -1919,6 +1921,9 @@ gx_default_map_cmyk_color(gx_device * dev, const gx_color_value cv[])
 {				/* Convert to RGB */
     frac rgb[3];
     gx_color_value rgb_cv[3];
+
+    exit(1);
+
     color_cmyk_to_rgb(cv2frac(cv[0]), cv2frac(cv[1]), cv2frac(cv[2]), cv2frac(cv[3]),
                       NULL, rgb, dev->memory);
     rgb_cv[0] = frac2cv(rgb[0]);
@@ -2072,7 +2077,7 @@ clamp_color_value(int i)
     return (gx_color_value)i;
 }
 
-/* Map from a color index to an rgb value. This is not color correct, but
+/* Map from a color index to rgb values. This is not color correct, but
  * just an approximation. */
 int
 gx_map_color_rgb(gx_device *dev, gx_color_index col, gx_color_value *rgb)
@@ -2103,6 +2108,37 @@ gx_map_color_rgb(gx_device *dev, gx_color_index col, gx_color_value *rgb)
             rgb[1] = comps[1];
             rgb[2] = dev->color_info.num_components < 3 ? comps[2] : 0;
             return ret;
+    }
+}
+
+/* Map from a rgb values to a color index. This is not color correct, but
+ * just an approximation. */
+gx_color_index
+gx_map_rgb_color(gx_device *dev, gx_color_value *rgb)
+{
+    gx_color_value comps[GX_DEVICE_COLOR_MAX_COMPONENTS];
+    int k;
+
+    switch (dev->color_info.num_components)
+    {
+        case 1:
+            comps[0] = (rgb[0] + 2*rgb[1] + rgb[2])>>2;
+            return dev_proc(dev, encode_color)(dev, comps);
+        case 4:
+            k = rgb[0];
+            if (rgb[1] < k)
+                k = rgb[1];
+            if (rgb[2] < k)
+                k = rgb[2];
+            comps[3] = k = gx_max_color_value - k;
+            comps[0] = gx_max_color_value - rgb[0] - k;
+            comps[1] = gx_max_color_value - rgb[1] - k;
+            comps[2] = gx_max_color_value - rgb[2] - k;
+            return dev_proc(dev, encode_color)(dev, comps);
+        case 3:
+            return dev_proc(dev, encode_color)(dev, rgb);
+        default:
+            exit(1);
     }
 }
 
