@@ -816,11 +816,11 @@ clist_finish_page(gx_device *dev, bool flush)
     }
     if (flush) {
         if (cdev->page_cfile != 0) {
-            code = cdev->page_info.io_procs->rewind(cdev->page_cfile, true, cdev->page_cfname);
+            code = cdev->page_info.io_procs->rewind(cdev->page_cfile, /*@@@JD true*/ false, cdev->page_cfname);
             if (code < 0) return code;
         }
         if (cdev->page_bfile != 0) {
-            code = cdev->page_info.io_procs->rewind(cdev->page_bfile, true, cdev->page_bfname);
+            code = cdev->page_info.io_procs->rewind(cdev->page_bfile, /*@@@JD true*/false, cdev->page_bfname);
             if (code < 0) return code;
         }
         cdev->page_info.bfile_end_pos = 0;

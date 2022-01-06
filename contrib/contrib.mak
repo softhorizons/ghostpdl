@@ -127,6 +127,7 @@ CONTDEV=$(AK) $(ECHOGS_XE) $(GDEVH)
 #		 ML-4500, ML-2xx, ML-1xxx, ML-5080, ML-6040, ... and
 #		 Lexmark E210, same as "gdi"
 #       xes      Xerox XES (2700, 3700, 4045, etc.)
+#   condor   Ritec Condor printer
 #
 # Fax systems:
 #
@@ -1233,6 +1234,21 @@ $(DD)md1xMono.dev : $(alps_) $(DD)page.dev \
 $(DEVOBJ)gdevalps.$(OBJ) : $(JAPSRC)gdevalps.c $(PDEVH) \
                            $(CONTRIB_MAK) $(MAKEDIRS)
 	$(DEVCC) $(O_)$@ $(C_) $(JAPSRC)gdevalps.c
+
+###@@@--------------- CONDOR device --------------------------###
+
+condor_=$(DEVOBJ)gdevcondor.$(OBJ) $(GLOBJ)gdevdevn.$(OBJ) 
+
+$(DD)condor.dev : $(GDEV) $(condor_) $(DD)page.dev \
+  $(GLOBJ)gdevdevn.$(OBJ) $(gxdevsop_h) $(CONTDEV) $(CONTRIB_MAK) $(MAKEDIRS)
+	$(SETPDEV) $(DD)condor $(condor_)
+
+$(DEVOBJ)gdevcondor.$(OBJ) : $(CONTRIBSRC)gdevcondor.c $(GDEV) \
+ $(CONTDEV) $(gxgetbit_h) $(gdevprn_h) $(gdevdevn_h)\
+ $(gdevdevnprn_h) $(gsparam_h) $(gxsync_h) $(gsfname_h) $(gxiodev_h)\
+ $(gssprintf_h)\
+ $(CONTRIB_MAK) $(MAKEDIRS)
+	$(DEVCC) $(DEVO_)gdevcondor.$(OBJ) $(C_) $(CONTRIBSRC)gdevcondor.c
 
 #########################################################################
 #########################################################################

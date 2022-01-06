@@ -129,3 +129,7 @@ tiff-config
 # gs/*.png
 # gs/*.tif
 # gs/*.tiff
+/.vs/VSWorkspaceState.json
+/zlib/zconf.h.included
+/.vs/slnx.sqlite
+/.vs

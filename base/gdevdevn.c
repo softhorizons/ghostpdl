@@ -362,6 +362,7 @@ devn_get_params(gx_device * pdev, gs_param_list * plist,
     int code, i = 0, spot_num;
     bool seprs = false;
     gs_param_string_array scna;
+    gs_param_string scn[GX_DEVICE_MAX_SEPARATIONS];
     gs_param_string_array sona;
     gs_param_int_array equiv_cmyk;
     /* there are 5 ints  per colorant in equiv_elements: a valid flag and an int for C, M, Y and K */
@@ -369,8 +370,13 @@ devn_get_params(gx_device * pdev, gs_param_list * plist,
     /* limit in case num_separations in pdevn_params exceeds what is expected. */
     int num_separations = min(pdevn_params->separations.num_separations, sizeof(equiv_elements)/(5*sizeof(int)));
 
+    for (spot_num = 0; spot_num < num_separations; ++spot_num) {
+        scn[spot_num].data = pdevn_params->separations.names[i].data;
+        scn[spot_num].size = pdevn_params->separations.names[i].size;
+        scn[spot_num].persistent = false;
+    }
+    set_param_array(scna, scn, num_separations); //@@@JD
 
-    set_param_array(scna, NULL, 0);
     set_param_array(sona, NULL, 0);
 
     if (pequiv_colors != NULL) {
@@ -1180,14 +1186,15 @@ gx_devn_prn_decode_color(gx_device * dev, gx_color_index color, gx_color_value *
 /* Get parameters. */
 int
 gx_devn_prn_get_params(gx_device *dev, gs_param_list *plist)
-{
-    gx_devn_prn_device *pdev = (gx_devn_prn_device *)dev;
-    int code = gdev_prn_get_params(dev, plist);
-
+{   /*@@@JDFIX Get devn params first to make them override
+     * same-named default prn params
+     */
+    gx_devn_prn_device* pdev = (gx_devn_prn_device*)dev;
+    int code = devn_get_params(dev, plist, &pdev->devn_params,
+                               &pdev->equiv_cmyk_colors);
     if (code < 0)
         return code;
-    return devn_get_params(dev, plist, &pdev->devn_params,
-                           &pdev->equiv_cmyk_colors);
+    return gdev_prn_get_params(dev, plist);
 }
 
 /* Set parameters. */

@@ -306,7 +306,7 @@ static void makePSFontName(char* family, int weight, int slant, char *buf, int b
 
 /* State struct for font iteration
  * - passed as an opaque 'void*' through the rest of gs */
-#ifdef HAVE_FONTCONFIG
+#ifdef HAVE_FONTCONFIG 
 typedef struct {
     int index;              /* current index of iteration over font_list */
     FcConfig* fc;           /* FontConfig library handle */
@@ -319,6 +319,7 @@ typedef struct {
 void *gp_enumerate_fonts_init(gs_memory_t *mem)
 {
 #ifdef HAVE_FONTCONFIG
+# define FC_HAVE_PSNAME defined(FC_MAJOR) && FC_MAJOR >= 2 && defined(FC_MINOR) && FC_MINOR >= 11
     unix_fontenum_t *state;
     FcPattern *pat;
     FcObjectSet *os;
@@ -379,6 +380,9 @@ void *gp_enumerate_fonts_init(gs_memory_t *mem)
             NULL);
     os = FcObjectSetBuild(FC_FILE, FC_OUTLINE,
             FC_FAMILY, FC_WEIGHT, FC_SLANT,
+#if FC_HAVE_PSNAME
+			FC_POSTSCRIPT_NAME,
+#endif
             NULL);
     /* We free the data allocated by FcFontList() when
     gp_enumerate_fonts_free() calls FcFontSetDestroy(), but FcFontSetDestroy()
@@ -406,6 +410,7 @@ int gp_enumerate_fonts_next(void *enum_state, char **fontname, char **path)
     unix_fontenum_t* state = (unix_fontenum_t *)enum_state;
     FcChar8 *file_fc = NULL;
     FcChar8 *family_fc = NULL;
+    FcChar8 *psname_fc = NULL;
     int outline_fc, slant_fc, weight_fc;
     FcPattern *font;
     FcResult result;
@@ -433,7 +438,13 @@ int gp_enumerate_fonts_next(void *enum_state, char **fontname, char **path)
             dmlprintf(state->mem, "DEBUG: FC_FILE mismatch\n");
             continue;
         }
-
+#if FC_HAVE_PSNAME
+        result = FcPatternGetString (font, FC_POSTSCRIPT_NAME, 0, &psname_fc);
+        if (result != FcResultMatch) {
+            dmlprintf(state->mem, "DEBUG: FC_POSTSCRIPT_NAME mismatch\n");
+            continue;
+        }
+#endif
         result = FcPatternGetString (font, FC_FAMILY, 0, &family_fc);
         if (result != FcResultMatch || family_fc == NULL) {
             dmlprintf1(state->mem, "DEBUG: FC_FAMILY mismatch in %s\n", (char *)file_fc);
@@ -460,12 +471,18 @@ int gp_enumerate_fonts_next(void *enum_state, char **fontname, char **path)
         break;
     }
 
-    /* Gross hack to work around Fontconfig's inability to tell
-     * us the font's PostScript name - generate it ourselves.
-     * We must free the memory allocated here next time around. */
-    makePSFontName((char *)family_fc, weight_fc, slant_fc,
-        (char *)&state->name, sizeof(state->name));
-    *fontname = (char *)&state->name;
+#if FC_HAVE_PSNAME
+	if (psname_fc != NULL)
+		*fontname = (char*)psname_fc;
+	else
+#endif
+	{
+	    /* Gross hack to work around Fontconfig's inability to tell
+	     * us the font's PostScript name - generate it ourselves. */
+	    makePSFontName((char *)family_fc, weight_fc, slant_fc,
+	        (char *)&state->name, sizeof(state->name));
+	    *fontname = (char *)&state->name;
+	}
 
     /* return the font path straight out of fontconfig */
     *path = (char*)file_fc;
