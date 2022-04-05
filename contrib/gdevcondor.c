@@ -37,6 +37,7 @@
 
 #include "math_.h"
 #include "string_.h"
+#include "memory_.h"
 #include "gxgetbit.h"
 #include "gdevprn.h"
 #include "gdevdevn.h"
@@ -910,7 +911,7 @@ condor_process(void* arg_, gx_device* dev_, gx_device* bdev,
     int code = 0;
     int w = rect->q.x - rect->p.x;
     int h = rect->q.y - rect->p.y;
-    int datalen = h * arg->dev_raster;
+    int stride = arg->dev_raster;
     gp_file* file = arg->file;
     gs_int_rect my_rect;
     long int ofs;
@@ -936,11 +937,24 @@ condor_process(void* arg_, gx_device* dev_, gx_device* bdev,
     if (code < 0)
         goto done;
 
+    /* Force stride to be actual width, not GS' 32-bit padded */
+    if (w & 3 != 0) {
+        const unsigned char* src = buffer->params.data[0] + stride; /* skip 1st line since effectively done */
+        unsigned char* dest = buffer->params.data[0] + w;
+        int cnt;
+        for (cnt = h - 1; cnt > 0; cnt--) {
+            memmove(dest, src, w); /* memmove() tolerates overlap */
+            src += stride;
+            dest += w;
+        }
+        stride = w;
+    }
+
     /* Write out buffer */
     gx_monitor_enter(arg->file_monitor);
-    ofs = rect->p.y * arg->dev_raster;
+    ofs = rect->p.y * stride;
     if (gp_fseek(file, ofs, 0) != 0 ||
-        gp_fwrite(buffer->params.data[0], 1, datalen, file) != datalen)
+        gp_fwrite(buffer->params.data[0], 1, stride * h, file) != stride * h)
         code = gs_error_ioerror;
     gx_monitor_leave(arg->file_monitor);
     if (code < 0)
@@ -954,22 +968,30 @@ condor_process(void* arg_, gx_device* dev_, gx_device* bdev,
         int i;
         unsigned char usage;
         unsigned char* raster_ptr = buffer->params.data[0];
-        int raster_cnt = datalen;
+
+        int raster_cnt = stride * h;
+
+        /* leading non-LL aligned bytes */
         while (raster_cnt != 0 && ((ULLONG)raster_ptr & amask) != 0) {
             accum |= *raster_ptr++;
             --raster_cnt;
         }
 
+        /* LL-aligned */
         word_cnt = raster_cnt / sizeof(ULLONG);
         raster_cnt -= word_cnt * sizeof(ULLONG);
         while (word_cnt-- != 0) {
             accum |= *(ULLONG*)raster_ptr;
             raster_ptr += sizeof(ULLONG);
         }
-        while (raster_cnt-- != 0)
-            accum |= *raster_ptr++;
 
-        usage = 0; /* de-parallelize usage from ULLONG to unsigned char*/
+        /* trailing non-LL aligned */
+        while (raster_cnt-- != 0) {
+           accum |= *raster_ptr++;
+        }
+
+        /* de-parallelize usage from ULLONG to unsigned char*/
+        usage = 0;
         for (i = 0; i < sizeof(ULLONG); ++i) {
             usage |= (unsigned char)(accum & 0x7f);
             accum >>= 8;
@@ -1075,7 +1097,7 @@ condor_spotcmyk_print_page(gx_device_printer* pdev, gp_file* prn_stream)
     gx_condor_prn_device* ppdev = (gx_condor_prn_device*)pdev;
     gx_process_page_options_t options;
     condor_process_arg_t arg;
-    arg.dev_raster = gx_device_raster(dev, 0);
+    arg.dev_raster = gx_device_raster(dev, 1);
     arg.component_count = COMPONENT_COUNT;
     arg.file = prn_stream;
     arg.file_monitor
