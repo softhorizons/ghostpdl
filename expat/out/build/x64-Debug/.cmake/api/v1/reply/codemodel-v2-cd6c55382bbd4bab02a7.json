@@ -1,0 +1,105 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.3"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "expat",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "elements::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-elements-Debug-0ff1beff7d61262999d9.json",
+					"name" : "elements",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "libexpat::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-libexpat-Debug-490ed1d89f9ee5bbda0d.json",
+					"name" : "libexpat",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "outline::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-outline-Debug-eca1362ed7484325da66.json",
+					"name" : "outline",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "runtests::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-runtests-Debug-162f8bcb5a434607b4c2.json",
+					"name" : "runtests",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "runtestspp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-runtestspp-Debug-93a585c5a6959d41d68d.json",
+					"name" : "runtestspp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "xmlwf::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-xmlwf-Debug-c1241bb8e2404af65abd.json",
+					"name" : "xmlwf",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug",
+		"source" : "C:/Users/JohnD/source/repos/ghostpdl/expat"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 2
+	}
+}

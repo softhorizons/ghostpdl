@@ -17,7 +17,7 @@
  *
  * Copyright (c) 2021 Soft Horizons, Inc. All Rights Reserved.
  * https://johndesrosiers.com
- * 
+ *
  * You probably don't have one and I can't even say what a Condor is,
  * but you may consider this an interesting example. Features:
  * - DeviceN with a constant number of components <= 7. Leverages gdevdevn.
@@ -52,9 +52,9 @@
 #define MAX_SPOTS 3 /* Max # spot colors (max 3) */
 #define COMPONENT_COUNT (4 + MAX_SPOTS)
 
-/*
- * A structure definition for a Condor printer type device, based on DeviceN Printer
- */
+ /*
+  * A structure definition for a Condor printer type device, based on DeviceN Printer
+  */
 typedef struct gx_condor_prn_device_s {
     gx_devn_prn_device_common;
 
@@ -299,8 +299,8 @@ condor_printer_put_params(gx_device* pdev, gs_param_list* plist,
      * devn_put_params() which recomputes depth to whatever, then immediately calls
      * gdev_prn_put_params() which will cause an error because BitsPerPixel (derived from depth)
      * is considered read-only.
-     * 
-     * So, we copy devn_printer_put_params and hack it to reset depth = 8 
+     *
+     * So, we copy devn_printer_put_params and hack it to reset depth = 8
      * immediately after devn_put_params()
      */
     code = condor_devn_printer_put_params(pdev, plist, pdevn_params, pequiv_colors);
@@ -474,9 +474,9 @@ gs_public_st_composite_final(st_gx_condor_prn_device, gx_condor_prn_device,
         ),\
         prn_device_body_rest_(condor_spotcmyk_print_page)
 
-/*
- * Device with CMYK and spot color support
- */
+ /*
+  * Device with CMYK and spot color support
+  */
 static const gx_device_procs spot_cmyk_procs = device_procs();
 
 const gx_condor_prn_device gs_condor_device =
@@ -506,7 +506,7 @@ test_extraction_speed(gs_memory_t* memory)
     unsigned dwidth = 900;
     unsigned height = 3600;
 
-    byte* dest = (byte *)gs_malloc(memory, dwidth * height, 1, "tester");
+    byte* dest = (byte*)gs_malloc(memory, dwidth * height, 1, "tester");
     byte* src = (byte*)gs_malloc(memory, swidth * height, 1, "tester src");
     byte lookup[256];
 
@@ -703,7 +703,7 @@ condor_spotcmyk_prn_open(gx_device* pdev)
     }
 
     /* Note that we set this in open, but that copied devices will default back to false.
-     * That means that the direct renderers and clist writers will see this true, but 
+     * That means that the direct renderers and clist writers will see this true, but
      * but the copies that the clist renderer makes for playback (w/o calling this open rtn)
      * will have this flag false since they don't call open(). That's perfect since
      * graphic_type_tag isn't valid during clist render phase, and that's exactly what we
@@ -762,7 +762,7 @@ gx_condor_prn_encode_color(gx_device* dev, const gx_color_value colors[])
 
     if (ncomp > COMPONENT_COUNT) ncomp = COMPONENT_COUNT;
     COLROUND_SETUP(bpc);
-    for (i = ncomp-1; i >= 0; i--) {
+    for (i = ncomp - 1; i >= 0; i--) {
         color <<= bpc;
         color |= COLROUND_ROUND(colors[i]);
     } //i.e. Spot=0x10, C=0x08, M=0x08, etc
@@ -774,10 +774,10 @@ gx_condor_prn_encode_color(gx_device* dev, const gx_color_value colors[])
      * not when playing back a clist (i.e. clist doesn't pass thru tags). Turns out
      * we can workaround because the clist does pass thru pure (undithered) device colors
      * like the white that's used to clear the page. Those will contain the opaque value we compute.
-     * 
+     *
      * This means that this func is called for fillpage when we're writing the clist (when
      * graphic_type_tag_valid is set), so we'll write the correct device color (not marked as opaque)
-     * into the clist. When reading back the clist we then use the stored device color 
+     * into the clist. When reading back the clist we then use the stored device color
      * without calling this function, so invalid graphic_type_tag doesn't matter.
      *
      * We've explained why this func will never be called *for fillpage* during clist playback
@@ -785,9 +785,9 @@ gx_condor_prn_encode_color(gx_device* dev, const gx_color_value colors[])
      * for proper opaque pixels. Note that while the clist playback uses recorded device
      * colors for pure colors, it still does call this routine for halftoned
      * colors since this device is SEPARABLE, meaning that that the playback will generate
-     * its own halftone tiles by ORing component-by-component the gx_color_index values we 
+     * its own halftone tiles by ORing component-by-component the gx_color_index values we
      * produce. We want to cause those pixels to be marked as opaque.
-     * 
+     *
      * Needless to say this is a nasty hack, but seems likely to be resistant to GS changes.
      */
     isfillpage = pcondor->graphic_type_tag_valid ?
@@ -819,10 +819,10 @@ gx_condor_prn_decode_color(gx_device* dev, gx_color_index color, gx_color_value*
 int
 gx_condor_prn_output_page(gx_device* pdev, int num_copies, int flush)
 {
-    /* Set up next OutputFile in anticipation of a possible open of output file. 
+    /* Set up next OutputFile in anticipation of a possible open of output file.
      * Can only do this now since we didn't want to force a close by setting
      * OutputFile directly since that could drain pipeline.
-     * 
+     *
      * Note this may only change actual output file if ReopenPerPage is true.
      */
     gx_condor_prn_device* pcondor = (gx_condor_prn_device*)pdev;
@@ -840,7 +840,6 @@ gx_condor_prn_output_page(gx_device* pdev, int num_copies, int flush)
  * passed to every process_page function:
  */
 typedef struct condor_process_arg_s {
-    int dev_raster;
     int component_count;
     gx_monitor_t* file_monitor;
     gp_file* file;
@@ -888,7 +887,7 @@ condor_free_buffer(void* arg_, gx_device* dev_, gs_memory_t* memory, void* buffe
     condor_process_buffer_t* buffer = (condor_process_buffer_t*)buffer_;
     (void)arg_;
     (void)dev_;
- 
+
     if (buffer) {
         gs_free_object(memory, buffer, "condor_init_buffer");
     }
@@ -903,19 +902,18 @@ condor_free_buffer(void* arg_, gx_device* dev_, gs_memory_t* memory, void* buffe
 # define ULLONG long unsigned
 #endif
 static int
-condor_process(void* arg_, gx_device* dev_, gx_device* bdev,
+condor_process(void* arg_, gx_device* dev, gx_device* bdev,
     const gs_int_rect* rect, void* buffer_)
 {
     condor_process_arg_t* arg = (condor_process_arg_t*)arg_;
     condor_process_buffer_t* buffer = (condor_process_buffer_t*)buffer_;
     int code = 0;
-    int w = rect->q.x - rect->p.x;
+    int w = rect->q.x - rect->p.x < dev->width ? rect->q.x - rect->p.x : dev->width;
     int h = rect->q.y - rect->p.y;
-    int stride = arg->dev_raster;
+    int stride = gx_device_raster(dev, 1);
     gp_file* file = arg->file;
     gs_int_rect my_rect;
     long int ofs;
-    (void)dev_;
 
     if (arg->result_code < 0)
         goto done;
@@ -926,7 +924,7 @@ condor_process(void* arg_, gx_device* dev_, gx_device* bdev,
      * Note that 'rect' as supplied to this function gives the position on the
      * page, where 'my_rect' is the equivalent rectangle in the current band.
      */
-    buffer->params.options = 
+    buffer->params.options =
         GB_COLORS_NATIVE | GB_ALPHA_NONE | GB_PACKING_CHUNKY | GB_RETURN_POINTER |
         GB_ALIGN_ANY | GB_OFFSET_0 | GB_RASTER_ANY;
     my_rect.p.x = 0;
@@ -937,8 +935,8 @@ condor_process(void* arg_, gx_device* dev_, gx_device* bdev,
     if (code < 0)
         goto done;
 
-    /* Force stride to be actual width, not GS' 32-bit padded */
-    if (w & 3 != 0) {
+    /* Force stride to be actual width, not GS' 32- or 64-bit padded */
+    if (w != stride) {
         const unsigned char* src = buffer->params.data[0] + stride; /* skip 1st line since effectively done */
         unsigned char* dest = buffer->params.data[0] + w;
         int cnt;
@@ -987,7 +985,7 @@ condor_process(void* arg_, gx_device* dev_, gx_device* bdev,
 
         /* trailing non-LL aligned */
         while (raster_cnt-- != 0) {
-           accum |= *raster_ptr++;
+            accum |= *raster_ptr++;
         }
 
         /* de-parallelize usage from ULLONG to unsigned char*/
@@ -1020,7 +1018,6 @@ condor_output(void* arg_, gx_device* dev_, void* buffer_)
     unsigned char i;
     int w = buffer->w;
     int h = buffer->h;
-    int raster = arg->dev_raster;
     */
 
     return 0;
@@ -1068,11 +1065,11 @@ condor_report(condor_process_arg_t* arg, gx_condor_prn_device* ppdev)
            SeparationOrder */
         for (i = 0;
             i < ppdev->devn_params.max_separations -
-             ppdev->devn_params.num_std_colorant_names;
+            ppdev->devn_params.num_std_colorant_names;
             ++i) {
             if (i < seps->num_separations) {
                 devn_separation_name* sep = &seps->names[i]; //@@@check sequence
-                    gp_fwrite(sep->data, sep->size, 1, report_file);
+                gp_fwrite(sep->data, sep->size, 1, report_file);
             }
             gp_fputs("\t", report_file);
         }
@@ -1096,8 +1093,8 @@ condor_spotcmyk_print_page(gx_device_printer* pdev, gp_file* prn_stream)
     gx_device* dev = (gx_device*)pdev;
     gx_condor_prn_device* ppdev = (gx_condor_prn_device*)pdev;
     gx_process_page_options_t options;
+
     condor_process_arg_t arg;
-    arg.dev_raster = gx_device_raster(dev, 1);
     arg.component_count = COMPONENT_COUNT;
     arg.file = prn_stream;
     arg.file_monitor
@@ -1108,7 +1105,7 @@ condor_spotcmyk_print_page(gx_device_printer* pdev, gp_file* prn_stream)
 
     arg.result_code = 0;
     arg.result_usage = 0;
- 
+
     /* Kick off the actual hard work */
     options.init_buffer_fn = condor_init_buffer;
     options.free_buffer_fn = condor_free_buffer;
@@ -1117,7 +1114,7 @@ condor_spotcmyk_print_page(gx_device_printer* pdev, gp_file* prn_stream)
     options.arg = &arg;
     options.options = 0;
     code = dev_proc(pdev, process_page)(dev, &options);
-    
+
     gx_monitor_free(arg.file_monitor);
 
     (void)condor_report(&arg, ppdev);

@@ -1,0 +1,12 @@
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/libexpat.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/xmlwf.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/elements.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/test.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/outline.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/runtestspp.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/runtests.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/list_install_components.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/install/local.dir
+C:/Users/JohnD/source/repos/ghostpdl/expat/out/build/x64-Debug/CMakeFiles/install.dir
